@@ -124,14 +124,16 @@
     [self reloadStyles];
 }
 
-- (BOOL)isHighlighted {
+- (void)setHighlighted:(BOOL)highlighted
+{
+	[super setHighlighted:highlighted];
     [self reloadStyles];
-    return [super isHighlighted];
 }
 
-- (BOOL)isSelected {
+- (void)setSelected:(BOOL)selected
+{
+	[super setSelected:selected];
     [self reloadStyles];
-    return [super isSelected];
 }
 
 # pragma mark - Methods

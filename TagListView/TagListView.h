@@ -22,6 +22,8 @@ typedef NS_ENUM(NSUInteger, TagListAlignment) {
 
 @property (nonatomic) IBInspectable UIColor *textColor;
 @property (nonatomic) IBInspectable UIColor *tagBackgroundColor;
+@property (nonatomic) IBInspectable UIColor *tagHighlightedBackgroundColor;
+@property (nonatomic) IBInspectable UIColor *tagSelectedBackgroundColor;
 @property (nonatomic) IBInspectable CGFloat cornerRadius;
 @property (nonatomic) IBInspectable CGFloat borderWidth;
 @property (nonatomic) IBInspectable UIColor *borderColor;
@@ -35,7 +37,7 @@ typedef NS_ENUM(NSUInteger, TagListAlignment) {
 
 // Delegate variables
 @property (nonatomic) CGFloat tagViewHeight;
-@property (nonatomic) NSMutableArray *tagViews;
+@property (nonatomic) NSMutableArray<TagView*>* tagViews;
 @property (nonatomic) NSInteger rows;
 
 - (void)addTagsAccordingToDataSourceArray:(NSArray<NSString *> *)dataSourceArray withOnTapForEach:(void(^)(TagView *tagView))onTapBlock;

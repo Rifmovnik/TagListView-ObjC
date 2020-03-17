@@ -20,6 +20,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+	self.tagListView.tagHighlightedBackgroundColor = [UIColor yellowColor];
     // Add tags programmatically
     [[self.tagListView addTag:@"Those"] setOnTap:^(TagView *tagView) {
         NSLog(@"on tap tagView:%@", tagView);
@@ -29,7 +30,7 @@
     [self.tagListView addTag:@"example"];
     [self.tagListView addTag:@"tags"];
     [self.tagListView addTagsAccordingToDataSourceArray:@[@"from", @"array", @"too"] withOnTapForEach:^(TagView *tagView) {
-        tagView.backgroundColor = [UIColor blueColor];
+        tagView.tagBackgroundColor = [UIColor blueColor];
     }];
     
     UIGestureRecognizer *recognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(listPressed)];    

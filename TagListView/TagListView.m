@@ -40,7 +40,23 @@
 - (void)setTagBackgroundColor:(UIColor *)tagBackgroundColor {
     _tagBackgroundColor = tagBackgroundColor;
     for(TagView *tagView in [self tagViews]) {
-        [tagView setBackgroundColor:tagBackgroundColor];
+        [tagView setTagBackgroundColor:tagBackgroundColor];
+    }
+}
+
+- (void)setTagHighlightedBackgroundColor:(UIColor *)tagHighlightedBackgroundColor
+{
+    _tagHighlightedBackgroundColor = tagHighlightedBackgroundColor;
+    for(TagView *tagView in [self tagViews]) {
+        [tagView setHighlightedBackgroundColor:tagHighlightedBackgroundColor];
+    }
+}
+
+- (void)setTagSelectedBackgroundColor:(UIColor *)tagSelectedBackgroundColor
+{
+    _tagSelectedBackgroundColor = tagSelectedBackgroundColor;
+    for(TagView *tagView in [self tagViews]) {
+        [tagView setSelectedBackgroundColor:tagSelectedBackgroundColor];
     }
 }
 
@@ -89,7 +105,7 @@
     [self rearrangeViews];
 }
 
-- (void)setRows:(int)rows {
+- (void)setRows:(NSInteger)rows {
     _rows = rows;
     [self invalidateIntrinsicContentSize];
 }
@@ -167,7 +183,9 @@
     TagView *tagView = [[TagView alloc] initWithTitle:title];
     
     [tagView setTextColor: [self textColor]];
-    [tagView setBackgroundColor: [self tagBackgroundColor]];
+    [tagView setTagBackgroundColor: [self tagBackgroundColor]];
+    [tagView setHighlightedBackgroundColor: [self tagHighlightedBackgroundColor]];
+    [tagView setSelectedBackgroundColor: [self tagSelectedBackgroundColor]];
     [tagView setCornerRadius: [self cornerRadius]];
     [tagView setBorderWidth: [self borderWidth]];
     [tagView setBorderColor: [self borderColor]];
