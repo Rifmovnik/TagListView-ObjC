@@ -131,48 +131,33 @@
     [self rearrangeViews];
 }
 
-- (void)rearrangeViews {
-    for(TagView *tagView in [self tagViews]) {
-        [tagView removeFromSuperview];
-    }
-    
-    int currentRow = 0;
-    int currentRowTagCount = 0;
-    CGFloat currentRowWidth = 0;
+- (void)rearrangeViews
+{
+    NSInteger rowCount = 0;
+    CGFloat rowWidth = 0;
     for(TagView *tagView in [self tagViews]) {
         CGRect tagViewFrame = [tagView frame];
         tagViewFrame.size = [tagView intrinsicContentSize];
         [tagView setFrame:tagViewFrame];
         self.tagViewHeight = tagViewFrame.size.height;
         
-        if (currentRowTagCount == 0 || (currentRowWidth + tagView.frame.size.width + [self marginX]) > self.frame.size.width) {
-            currentRow += 1;
-            CGRect tempFrame = [tagView frame];
-            tempFrame.origin.x = 0;
-            tempFrame.origin.y = (currentRow - 1) * ([self tagViewHeight] + [self marginY]);
-            [tagView setFrame:tempFrame];
-            
-            currentRowTagCount = 1;
-            currentRowWidth = tagView.frame.size.width + [self marginX];
-        } else {
-            CGRect tempFrame = [tagView frame];
-            tempFrame.origin.x = currentRowWidth;
-            tempFrame.origin.y = (currentRow - 1) * ([self tagViewHeight] + [self marginY]);
-            [tagView setFrame:tempFrame];
-            
-            currentRowTagCount += 1;
-            currentRowWidth += tagView.frame.size.width + [self marginX];
+		CGRect rect = [tagView frame];
+        if (rowCount == 0 || (rowWidth + tagView.frame.size.width + [self marginX]) > self.frame.size.width - self.layoutMargins.left - self.layoutMargins.right) {
+            rowCount += 1;
+            rowWidth = 0;
         }
-        
-        [self addSubview:tagView];
+		rect.origin.x = rowWidth + self.layoutMargins.left;
+		rect.origin.y = (rowCount - 1) * ([self tagViewHeight] + [self marginY]) + self.layoutMargins.top;
+		tagView.frame = rect;
+		rowWidth += tagView.frame.size.width + [self marginX];
     }
-    self.rows = currentRow;
+    self.rows = rowCount;
 }
 
 # pragma mark - Manage tags
 
 - (CGSize) intrinsicContentSize {
-    CGFloat height = [self rows] * ([self tagViewHeight] + [self marginY]);
+    CGFloat height = [self rows] * ([self tagViewHeight] + [self marginY]) + self.layoutMargins.top + self.layoutMargins.bottom;
     if([self rows] > 0) {
         height -= [self marginY];
     }
@@ -201,7 +186,8 @@
 }
 
 - (void) addTagView:(TagView *)tagView {
-    [[self tagViews] insertObject:tagView atIndex:[self.tagViews count]];
+    [self.tagViews addObject:tagView];
+	[self addSubview:tagView];
     [self rearrangeViews];
 }
 

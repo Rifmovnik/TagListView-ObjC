@@ -20,7 +20,9 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+	self.tagListView.backgroundColor = [UIColor greenColor];
 	self.tagListView.tagHighlightedBackgroundColor = [UIColor yellowColor];
+	self.tagListView.layoutMargins = UIEdgeInsetsMake(20, 60, 20, 0);
     // Add tags programmatically
     [[self.tagListView addTag:@"Those"] setOnTap:^(TagView *tagView) {
         NSLog(@"on tap tagView:%@", tagView);
