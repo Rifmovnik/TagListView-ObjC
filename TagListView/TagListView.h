@@ -34,11 +34,7 @@ typedef NS_ENUM(NSUInteger, TagListAlignment) {
 @property (nonatomic) TagListAlignment alignment;
 @property (nonatomic) UIFont *textFont;
 
-
-// Delegate variables
-@property (nonatomic) CGFloat tagViewHeight;
-@property (nonatomic) NSMutableArray<TagView*>* tagViews;
-@property (nonatomic) NSInteger rows;
+@property (nonatomic, readonly) NSArray<TagView*>* tagViews;
 
 - (void)addTagsAccordingToDataSourceArray:(NSArray<NSString *> *)dataSourceArray withOnTapForEach:(void(^)(TagView *tagView))onTapBlock;
 - (TagView *)addTag:(NSString *)title;

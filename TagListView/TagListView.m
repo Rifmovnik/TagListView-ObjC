@@ -11,6 +11,9 @@
 
 @interface TagListView ()
 
+@property (nonatomic) NSMutableArray<TagView*>* tagViews;
+@property (nonatomic) CGFloat intrinsicContentHeight;
+
 @end
 
 @implementation TagListView
@@ -23,23 +26,18 @@
 }
 #endif
 
-- (NSMutableArray *)tagViews {
-    if(!_tagViews) {
-        [self setTagViews:[[NSMutableArray alloc] init]];
-    }
-    return _tagViews;
-}
-
-- (void)setTextColor:(UIColor *)textColor {
+- (void)setTextColor:(UIColor *)textColor
+{
     _textColor = textColor;
-    for(TagView *tagView in [self tagViews]) {
+    for(TagView *tagView in self.tagViews) {
         [tagView setTextColor:textColor];
     }
 }
 
-- (void)setTagBackgroundColor:(UIColor *)tagBackgroundColor {
+- (void)setTagBackgroundColor:(UIColor *)tagBackgroundColor
+{
     _tagBackgroundColor = tagBackgroundColor;
-    for(TagView *tagView in [self tagViews]) {
+    for(TagView *tagView in self.tagViews) {
         [tagView setTagBackgroundColor:tagBackgroundColor];
     }
 }
@@ -47,7 +45,7 @@
 - (void)setTagHighlightedBackgroundColor:(UIColor *)tagHighlightedBackgroundColor
 {
     _tagHighlightedBackgroundColor = tagHighlightedBackgroundColor;
-    for(TagView *tagView in [self tagViews]) {
+    for(TagView *tagView in self.tagViews) {
         [tagView setHighlightedBackgroundColor:tagHighlightedBackgroundColor];
     }
 }
@@ -55,69 +53,73 @@
 - (void)setTagSelectedBackgroundColor:(UIColor *)tagSelectedBackgroundColor
 {
     _tagSelectedBackgroundColor = tagSelectedBackgroundColor;
-    for(TagView *tagView in [self tagViews]) {
+    for(TagView *tagView in self.tagViews) {
         [tagView setSelectedBackgroundColor:tagSelectedBackgroundColor];
     }
 }
 
-- (void)setCornerRadius:(CGFloat)cornerRadius {
+- (void)setCornerRadius:(CGFloat)cornerRadius
+{
     _cornerRadius = cornerRadius;
-    for(TagView *tagView in [self tagViews]) {
+    for(TagView *tagView in self.tagViews) {
         [tagView setCornerRadius:cornerRadius];
     }
 }
 
-- (void)setBorderWidth:(CGFloat)borderWidth {
+- (void)setBorderWidth:(CGFloat)borderWidth
+{
     _borderWidth = borderWidth;
-    for(TagView *tagView in [self tagViews]) {
+    for(TagView *tagView in self.tagViews) {
         [tagView setBorderWidth:borderWidth];
     }
 }
 
-- (void)setBorderColor:(UIColor *)borderColor {
+- (void)setBorderColor:(UIColor *)borderColor
+{
     _borderColor = borderColor;
-    for(TagView *tagView in [self tagViews]) {
+    for(TagView *tagView in self.tagViews) {
         [tagView setBorderColor:borderColor];
     }
 }
 
-- (void)setPaddingY:(CGFloat)paddingY {
+- (void)setPaddingY:(CGFloat)paddingY
+{
     _paddingY = paddingY;
-    for(TagView *tagView in [self tagViews]) {
+    for(TagView *tagView in self.tagViews) {
         [tagView setPaddingY:paddingY];
     }
 }
 
-- (void)setPaddingX:(CGFloat)paddingX {
+- (void)setPaddingX:(CGFloat)paddingX
+{
     _paddingX = paddingX;
-    for(TagView *tagView in [self tagViews]) {
+    for(TagView *tagView in self.tagViews) {
         [tagView setPaddingX:paddingX];
     }
 }
 
-- (void)setMarginY:(CGFloat)marginY {
+- (void)setMarginY:(CGFloat)marginY
+{
     _marginY = marginY;
     [self rearrangeViews];
 }
 
-- (void)setMarginX:(CGFloat)marginX {
+- (void)setMarginX:(CGFloat)marginX
+{
     _marginX = marginX;
     [self rearrangeViews];
 }
 
-- (void)setRows:(NSInteger)rows {
-    _rows = rows;
-    [self invalidateIntrinsicContentSize];
-}
-
-- (void)setAlignment:(TagListAlignment)alignment {
+- (void)setAlignment:(TagListAlignment)alignment
+{
     _alignment = alignment;
     [self rearrangeViews];
 }
 
 # pragma mark - Interface builder
 
-- (void)prepareForInterfaceBuilder {
+- (void)prepareForInterfaceBuilder
+{
     [self addTag:@"Thanks"];
     [self addTag:@"for"];
     [self addTag:@"using"];
@@ -126,45 +128,65 @@
 
 # pragma mark - Layout
 
-- (void)layoutSubviews {
+- (CGSize)sizeThatFits:(CGSize)size
+{
+	CGFloat height = 0;
+    CGSize rowSize = CGSizeZero;
+    for(TagView *tagView in self.tagViews) {
+        CGSize tagSize = tagView.intrinsicContentSize;
+        if(rowSize.width + tagSize.width + self.marginX > size.width - self.layoutMargins.left - self.layoutMargins.right) {
+			height += rowSize.height + self.marginY;
+			rowSize = CGSizeZero;
+        }
+		rowSize.width += tagSize.width + self.marginX;
+		rowSize.height = MAX(rowSize.height, tagSize.height);
+    }
+	if(rowSize.height > 0) {
+		height += rowSize.height + self.layoutMargins.top + self.layoutMargins.bottom;
+	}
+    return CGSizeMake(size.width, height);
+}
+
+- (void)layoutSubviews
+{
     [super layoutSubviews];
     [self rearrangeViews];
 }
 
 - (void)rearrangeViews
 {
-    NSInteger rowCount = 0;
-    CGFloat rowWidth = 0;
-    for(TagView *tagView in [self tagViews]) {
-        CGRect tagViewFrame = [tagView frame];
-        tagViewFrame.size = [tagView intrinsicContentSize];
-        [tagView setFrame:tagViewFrame];
-        self.tagViewHeight = tagViewFrame.size.height;
-        
-		CGRect rect = [tagView frame];
-        if (rowCount == 0 || (rowWidth + tagView.frame.size.width + [self marginX]) > self.frame.size.width - self.layoutMargins.left - self.layoutMargins.right) {
-            rowCount += 1;
-            rowWidth = 0;
+	CGFloat height = 0;
+    CGSize rowSize = CGSizeZero;
+    for(TagView *tagView in self.tagViews) {
+        CGSize tagSize = tagView.intrinsicContentSize;
+        if(rowSize.width + tagView.frame.size.width + self.marginX > self.frame.size.width - self.layoutMargins.left - self.layoutMargins.right) {
+			height += rowSize.height + self.marginY;
+			rowSize = CGSizeZero;
         }
-		rect.origin.x = rowWidth + self.layoutMargins.left;
-		rect.origin.y = (rowCount - 1) * ([self tagViewHeight] + [self marginY]) + self.layoutMargins.top;
+		CGRect rect;
+		rect.origin.x = rowSize.width + self.layoutMargins.left;
+		rect.origin.y = height + self.layoutMargins.top;
+		rect.size = tagSize;
 		tagView.frame = rect;
-		rowWidth += tagView.frame.size.width + [self marginX];
+		rowSize.width += tagSize.width + self.marginX;
+		rowSize.height = MAX(rowSize.height, tagSize.height);
     }
-    self.rows = rowCount;
+	if(rowSize.height > 0) {
+		height += rowSize.height + self.layoutMargins.top + self.layoutMargins.bottom;
+	}
+	self.intrinsicContentHeight = height;
+    [self invalidateIntrinsicContentSize];
 }
 
 # pragma mark - Manage tags
 
-- (CGSize) intrinsicContentSize {
-    CGFloat height = [self rows] * ([self tagViewHeight] + [self marginY]) + self.layoutMargins.top + self.layoutMargins.bottom;
-    if([self rows] > 0) {
-        height -= [self marginY];
-    }
-    return CGSizeMake(self.frame.size.width, height);
+- (CGSize) intrinsicContentSize
+{
+    return CGSizeMake(self.frame.size.width, self.intrinsicContentHeight);
 }
 
-- (TagView *)addTag:(NSString *)title {
+- (TagView *)addTag:(NSString *)title
+{
     TagView *tagView = [[TagView alloc] initWithTitle:title];
     
     [tagView setTextColor: [self textColor]];
@@ -181,12 +203,15 @@
     [tagView addTarget:self action:@selector(tagPressed:) forControlEvents:UIControlEventTouchUpInside];
     
     [self addTagView: tagView];
-    
     return tagView;
 }
 
-- (void) addTagView:(TagView *)tagView {
-    [self.tagViews addObject:tagView];
+- (void) addTagView:(TagView *)tagView
+{
+	if(!_tagViews) {
+		_tagViews = [NSMutableArray new];
+	}
+    [_tagViews addObject:tagView];
 	[self addSubview:tagView];
     [self rearrangeViews];
 }
@@ -195,33 +220,35 @@
 {
     for (NSString *tagName in dataSourceArray) {
         TagView *tagView = [self addTag:tagName];
-        
-        if (onTapBlock)
+		if (onTapBlock) {
             tagView.onTap = onTapBlock;
+		}
     }
 }
 
-- (void)removeTag:(NSString *)title {
-    // Author's note: Loop the array in reversed order to remove items during loop
-    for(int index = (int)[[self tagViews] count] - 1 ; index <= 0; index--) {
-        TagView *tagView = [[self tagViews] objectAtIndex:index];
+- (void)removeTag:(NSString *)title
+{
+    for(NSInteger index = self.tagViews.count - 1; index >= 0; index--) {
+        TagView *tagView = self.tagViews[index];
         if([[tagView currentTitle] isEqualToString:title]) {
             [tagView removeFromSuperview];
-            [[self tagViews] removeObjectAtIndex:index];
+            [_tagViews removeObjectAtIndex:index];
         }
     }
 }
 
-- (void)removeAllTags {
-    for(TagView *tagView in [self tagViews]) {
+- (void)removeAllTags
+{
+    for(TagView *tagView in self.tagViews) {
         [tagView removeFromSuperview];
     }
-    [self setTagViews:[[NSMutableArray alloc] init]];
+	_tagViews = nil;
     [self rearrangeViews];
 }
 
-- (void)tagPressed:(TagView *)sender {
-    if (sender.onTap) {
+- (void)tagPressed:(TagView *)sender
+{
+    if(sender.onTap) {
         sender.onTap(sender);
     }
 }
